@@ -1,8 +1,11 @@
 import re
 from pathlib import Path
+from unicodedata import normalize as unicode_normalize
 
 import requests
 from flask import Flask, jsonify, render_template, send_from_directory
+
+from species_names import ZH_HANT_NAMES
 
 app = Flask(__name__, static_folder=None)
 PUBLIC_ASSETS = Path(__file__).resolve().parent / "public" / "assets"
@@ -10,6 +13,12 @@ POKEAPI = "https://pokeapi.co/api/v2/pokemon"
 REQUEST_TIMEOUT = 8
 LAST_NATIONAL_ID = 1025
 SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*", re.ASCII)
+ZH_HANT_IDS = {
+    unicode_normalize("NFKC", name): species_id
+    for species_id, name in ZH_HANT_NAMES.items()
+}
+SPECIES_URL = re.compile(r"https://pokeapi\.co/api/v2/pokemon-species/([0-9]{1,10})/")
+HAN = re.compile(r"[\u3400-\u9fff\U00020000-\U000323af]")
 SPRITE_URL = re.compile(
     r"https://raw\.githubusercontent\.com/PokeAPI/sprites/master/"
     r"sprites/pokemon/(?:other/official-artwork/)?[0-9]+\.png"
@@ -49,8 +58,14 @@ def normalize(data):
          if isinstance(url, str) and SPRITE_URL.fullmatch(url)),
         None,
     )
+    species = data.get("species")
+    species_url = species.get("url") if isinstance(species, dict) else None
+    species_match = SPECIES_URL.fullmatch(species_url) if isinstance(species_url, str) else None
+    species_id = int(species_match[1]) if species_match else pokemon_id
+
     return {
         "id": pokemon_id,
+        "name_zh_hant": ZH_HANT_NAMES.get(species_id),
         "name": name,
         "types": type_names,
         "height_m": height / 10,
@@ -76,9 +91,16 @@ def health():
 
 @app.get("/api/pokemon/<name_or_id>")
 def pokemon(name_or_id):
-    key = name_or_id.strip().lower()
-    if len(key) > 80 or not SLUG.fullmatch(key):
-        return error("請輸入英文名稱或正整數圖鑑編號。", 400)
+    query = unicode_normalize("NFKC", name_or_id.strip())
+    if len(query) > 80:
+        return error("請輸入繁體中文名稱、英文名稱或正整數圖鑑編號。", 400)
+
+    species_id = ZH_HANT_IDS.get(query)
+    key = str(species_id) if species_id is not None else query.lower()
+    if not SLUG.fullmatch(key):
+        if HAN.search(query):
+            return error("找不到這個繁體中文名稱，請確認名稱或改用圖鑑編號查詢。", 404)
+        return error("請輸入繁體中文名稱、英文名稱或正整數圖鑑編號。", 400)
     if key.isascii() and key.isdecimal():
         key = key.lstrip("0")
         if not key:
@@ -96,7 +118,7 @@ def pokemon(name_or_id):
         return error("目前無法連線到圖鑑服務，請稍後重試。", 502)
 
     if upstream.status_code == 404:
-        return error("找不到這隻寶可夢，請確認英文名稱或編號。", 404)
+        return error("找不到這隻寶可夢，請確認繁體中文名稱、英文名稱或編號。", 404)
     if upstream.status_code == 429:
         return error("查詢次數過多，請稍等一下再試。", 429)
     if upstream.status_code != 200:

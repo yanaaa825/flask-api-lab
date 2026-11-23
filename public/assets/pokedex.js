@@ -32,7 +32,7 @@ function showImage(pokemon) {
     if (!pokemon.image_url) return;
 
     const image = document.createElement("img");
-    image.alt = pokemon.name + " 的圖片";
+    image.alt = (pokemon.name_zh_hant ?? pokemon.name) + " 的圖片";
     image.addEventListener("error", () => {
         if (!art.contains(image)) return;
         image.remove();
@@ -45,7 +45,7 @@ function showImage(pokemon) {
 
 function render(pokemon) {
     document.querySelector("#pokemon-id").textContent = "#" + String(pokemon.id).padStart(4, "0");
-    document.querySelector("#pokemon-name").textContent = pokemon.name;
+    document.querySelector("#pokemon-name").textContent = pokemon.name_zh_hant ?? pokemon.name;
     document.querySelector("#height").textContent = pokemon.height_m + " 公尺";
     document.querySelector("#weight").textContent = pokemon.weight_kg + " 公斤";
 
@@ -82,7 +82,7 @@ async function loadPokemon(value) {
             return;
         }
         render(data);
-        setStatus("已顯示 " + data.name + " 的圖鑑資料。");
+        setStatus("已顯示 " + (data.name_zh_hant ?? data.name) + " 的圖鑑資料。");
     } catch (error) {
         if (activeRequest === request && error.name !== "AbortError") {
             setStatus("暫時無法載入圖鑑資料，請稍後重試。", true);
@@ -92,11 +92,11 @@ async function loadPokemon(value) {
 
 search.addEventListener("submit", (event) => {
     event.preventDefault();
-    const value = query.value.trim();
-    if (!/^(?:[a-z0-9]+(?:-[a-z0-9]+)*)$/i.test(value) || /^0+$/.test(value)) {
+    const value = query.value.trim().normalize("NFKC");
+    if (!value || /[/\\]/.test(value) || /^0+$/.test(value)) {
         activeRequest?.abort();
         activeRequest = null;
-        setStatus("請輸入英文名稱或正整數圖鑑編號。", true);
+        setStatus("請輸入繁體中文名稱、英文名稱或正整數圖鑑編號。", true);
         query.focus();
         return;
     }

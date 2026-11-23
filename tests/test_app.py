@@ -40,7 +40,8 @@ class PokedexTests(unittest.TestCase):
                 response = self.client.get(f"/api/pokemon/{key}")
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.json, {
-                    "id": 25, "name": "pikachu", "types": ["electric"],
+                    "id": 25, "name": "pikachu", "name_zh_hant": "皮卡丘",
+                    "types": ["electric"],
                     "height_m": 0.4, "weight_kg": 6.0,
                     "image_url": self.payload["sprites"]["front_default"],
                 })
@@ -48,6 +49,39 @@ class PokedexTests(unittest.TestCase):
                     f"https://pokeapi.co/api/v2/pokemon/{normalized}/",
                     timeout=8, allow_redirects=False,
                 )
+
+    def test_traditional_chinese_search(self):
+        for pokemon_id, english, chinese in (
+            (25, "pikachu", "皮卡丘"),
+            (1, "bulbasaur", "妙蛙種子"),
+            (6, "charizard", "噴火龍"),
+        ):
+            with self.subTest(chinese=chinese):
+                self.payload.update(id=pokemon_id, name=english)
+                self.get.reset_mock()
+                response = self.client.get(f"/api/pokemon/{chinese}")
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json["name_zh_hant"], chinese)
+                self.get.assert_called_once_with(
+                    f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}/",
+                    timeout=8, allow_redirects=False,
+                )
+
+    def test_unknown_chinese_name_skips_upstream(self):
+        response = self.client.get("/api/pokemon/查無此寶可夢")
+        self.assertEqual(response.status_code, 404)
+        self.get.assert_not_called()
+
+    def test_alternate_form_uses_species_name(self):
+        self.payload.update(
+            id=10004,
+            name="deoxys-attack",
+            species={"url": "https://pokeapi.co/api/v2/pokemon-species/386/"},
+        )
+        response = self.client.get("/api/pokemon/deoxys-attack")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["id"], 10004)
+        self.assertEqual(response.json["name_zh_hant"], "代歐奇希斯")
 
     def test_invalid_inputs_never_reach_upstream(self):
         for key in ("0", "026_", "%20", "a" * 81):

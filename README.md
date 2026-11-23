@@ -1,6 +1,6 @@
 # 寶可夢圖鑑 Pokédex
 
-使用 Python 3.12、Flask、requests、HTML、CSS、JavaScript 與 PokéAPI。首頁預設顯示皮卡丘，可以用英文名稱或編號搜尋。隨機與前後導覽涵蓋全國圖鑑編號 1 至 1025。其他型態仍可依 PokéAPI 名稱或資源 ID 搜尋。
+使用 Python 3.12、Flask、requests、HTML、CSS、JavaScript 與 PokéAPI。首頁預設顯示皮卡丘，可以用繁體中文名稱、英文名稱或編號搜尋。隨機與前後導覽涵蓋全國圖鑑編號 1 至 1025。其他型態仍可依 PokéAPI 名稱或資源 ID 搜尋。
 
 ## 在 Windows PowerShell 啟動
 
@@ -29,9 +29,11 @@ py -3.12 -m venv .venv
 | --- | --- |
 | `GET /` | 圖鑑首頁 |
 | `GET /api/health` | `{"ok": true}` |
-| `GET /api/pokemon/<name_or_id>` | `id`、`name`、`types`、`height_m`、`weight_kg`、`image_url` |
+| `GET /api/pokemon/<name_or_id>` | `id`、`name`、`name_zh_hant`、`types`、`height_m`、`weight_kg`、`image_url` |
 
 錯誤回應使用 `{"error": "繁體中文訊息"}`。輸入錯誤回傳 400，查無資料回傳 404，上游限流回傳 429，逾時回傳 504，其餘上游失敗或必要欄位格式錯誤回傳 502。缺少可用圖片時，`image_url` 為 `null`。圖片限定 PokéAPI 官方 sprites 儲存庫的 HTTPS PNG 路徑，優先選用官方插畫並可退回預設正面圖。發往 PokéAPI 的 requests 呼叫設定 8 秒 timeout。
+
+繁體中文索引存於 `species_names.py`，取自 PokéAPI 專案的物種名稱表，使用 `pokemon-species` 的 `zh-hant` 名稱。搜尋時在記憶體內將繁中名稱轉為物種編號，再呼叫寶可夢詳情端點一次。其他型態以所屬物種的繁中名稱顯示，查無繁中名稱時顯示英文。 [PokéAPI 物種名稱表](https://github.com/PokeAPI/pokeapi/blob/master/data/v2/csv/pokemon_species_names.csv)
 
 原始端點和欄位調查見 `api-spec.md`。 [PokéAPI 官方文件](https://pokeapi.co/docs/v2#pokemon)
 
