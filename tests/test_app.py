@@ -59,7 +59,7 @@ class PokedexTests(unittest.TestCase):
             with self.subTest(chinese=chinese):
                 self.payload.update(id=pokemon_id, name=english)
                 self.get.reset_mock()
-                response = self.client.get(f"/api/pokemon/{chinese}")
+                response = self.client.get("/api/pokemon", query_string={"q": chinese})
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.json["name_zh_hant"], chinese)
                 self.get.assert_called_once_with(

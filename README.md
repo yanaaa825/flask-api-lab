@@ -30,6 +30,7 @@ py -3.12 -m venv .venv
 | `GET /` | 圖鑑首頁 |
 | `GET /api/health` | `{"ok": true}` |
 | `GET /api/pokemon/<name_or_id>` | `id`、`name`、`name_zh_hant`、`types`、`height_m`、`weight_kg`、`image_url` |
+| `GET /api/pokemon?q=<name_or_id>` | 網頁使用的查詢介面，回應欄位與上列相同 |
 
 錯誤回應使用 `{"error": "繁體中文訊息"}`。輸入錯誤回傳 400，查無資料回傳 404，上游限流回傳 429，逾時回傳 504，其餘上游失敗或必要欄位格式錯誤回傳 502。缺少可用圖片時，`image_url` 為 `null`。圖片限定 PokéAPI 官方 sprites 儲存庫的 HTTPS PNG 路徑，優先選用官方插畫並可退回預設正面圖。發往 PokéAPI 的 requests 呼叫設定 8 秒 timeout。
 

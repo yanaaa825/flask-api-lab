@@ -3,7 +3,7 @@ from pathlib import Path
 from unicodedata import normalize as unicode_normalize
 
 import requests
-from flask import Flask, jsonify, render_template, send_from_directory
+from flask import Flask, jsonify, render_template, request, send_from_directory
 
 from species_names import ZH_HANT_NAMES
 
@@ -87,6 +87,11 @@ def local_assets(filename):
 @app.get("/api/health")
 def health():
     return jsonify(ok=True)
+
+
+@app.get("/api/pokemon")
+def pokemon_search():
+    return pokemon(request.args.get("q", ""))
 
 
 @app.get("/api/pokemon/<name_or_id>")

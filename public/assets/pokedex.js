@@ -71,7 +71,7 @@ async function loadPokemon(value) {
     activeRequest = request;
     setStatus("載入中…");
     try {
-        const response = await fetch("/api/pokemon/" + encodeURIComponent(value), {
+        const response = await fetch("/api/pokemon?" + new URLSearchParams({ q: value }), {
             signal: request.signal,
             headers: { Accept: "application/json" }
         });
