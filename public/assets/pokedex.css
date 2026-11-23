@@ -1,0 +1,73 @@
+:root {
+    font-family: system-ui, "Microsoft JhengHei", sans-serif;
+    color: #202732;
+    background: #f6f3ee;
+    --red: #a92d38;
+    --line: #e5ddd5;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; border-top: 8px solid var(--red); }
+.shell { width: min(100% - 2rem, 900px); margin: 0 auto; padding: 2.75rem 0 1.5rem; }
+.masthead { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+h1 { font-size: clamp(1.6rem, 5vw, 3rem); line-height: 1.1; margin: 0; letter-spacing: -.045em; }
+h1 span { font-weight: 500; color: var(--red); }
+.mark {
+    width: 2.7rem; aspect-ratio: 1; flex: none; border-radius: 50%;
+    background: linear-gradient(#c83945 0 44%, #202732 44% 56%, white 56%);
+    border: 3px solid #202732; position: relative;
+}
+.mark::after {
+    content: ""; position: absolute; inset: 33%; border-radius: 50%;
+    background: #fff; border: 2px solid #202732;
+}
+.search label { display: block; margin-bottom: .55rem; font-weight: 700; }
+.controls { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: .65rem; }
+input, button { font: inherit; border: 1px solid var(--line); border-radius: .65rem; padding: .75rem .95rem; min-height: 44px; }
+input { width: 100%; background: #fff; color: inherit; }
+button { background: var(--red); border-color: var(--red); color: #fff; font-weight: 700; cursor: pointer; }
+button:hover:not(:disabled) { filter: brightness(.93); }
+button:disabled { opacity: .45; cursor: default; }
+.secondary { background: #fff; border-color: var(--line); color: #26323e; }
+:focus-visible { outline: 3px solid #1d6386; outline-offset: 3px; }
+#status { min-height: 1.5em; margin: .7rem 0; color: #54504b; }
+#status.error { color: #9a2433; }
+.card {
+    display: grid; grid-template-columns: 1.2fr 1fr; overflow: hidden;
+    border: 1px solid var(--line); border-radius: 1.4rem; background: #fff;
+    box-shadow: 0 14px 35px #412c1710;
+}
+.art {
+    display: grid; place-items: center; min-height: 330px; padding: 1.25rem;
+    background: radial-gradient(circle, #fff9dc 0 37%, transparent 37.5%),
+        repeating-linear-gradient(0deg, transparent 0 27px, #c69e4624 27px 28px),
+        repeating-linear-gradient(90deg, #f8ecd0 0 27px, #ecd7a8 27px 28px);
+}
+.art img { width: min(100%, 300px); aspect-ratio: 1; object-fit: contain; }
+#image-message { background: #fff; padding: .65rem .85rem; border-radius: .6rem; margin: 0; text-align: center; }
+.details { padding: clamp(1.3rem, 4vw, 2.75rem); align-self: center; min-width: 0; }
+.number { color: var(--red); font: 700 1rem ui-monospace, monospace; letter-spacing: .12em; margin: 0 0 .45rem; }
+h2 { font-size: clamp(1.7rem, 5vw, 3rem); text-transform: capitalize; overflow-wrap: anywhere; line-height: 1.05; margin: 0; }
+.types { display: flex; flex-wrap: wrap; gap: .45rem; list-style: none; padding: 0; margin: 1rem 0 1.5rem; }
+.types li { background: #f0efed; border-radius: 2rem; padding: .35rem .7rem; font-size: .9rem; font-weight: 700; }
+.types li[data-type="electric"] { background: #ffec9b; color: #4f3d00; }
+.types li[data-type="grass"] { background: #dcefd1; color: #254324; }
+.types li[data-type="fire"] { background: #ffded5; color: #792a23; }
+.types li[data-type="water"] { background: #dcecf9; color: #173c64; }
+.measurements { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin: 0; }
+.measurements div { border-top: 1px solid var(--line); padding-top: .75rem; }
+dt, footer { color: #5f5b56; font-size: .88rem; }
+dd { margin: .25rem 0 0; font-size: 1.15rem; font-weight: 700; }
+nav { display: flex; justify-content: space-between; gap: .65rem; margin-top: 1rem; }
+footer { margin-top: 2rem; text-align: center; }
+footer a { color: #86313b; }
+@media (max-width: 600px) {
+    .shell { padding-top: 1.5rem; }
+    .masthead { margin-bottom: 1.4rem; }
+    .controls { grid-template-columns: minmax(0, 1fr) auto; }
+    #random { grid-column: 1 / -1; }
+    .card { grid-template-columns: 1fr; }
+    .art { min-height: 210px; }
+    .art img { width: min(100%, 210px); }
+}

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>寶可夢圖鑑 Pokédex</title>
+    <link rel="stylesheet" href="/assets/pokedex.css">
+    <script src="/assets/pokedex.js" defer></script>
+</head>
+<body data-last-id="{{ last_national_id }}">
+    <main class="shell">
+        <header class="masthead">
+            <span class="mark" aria-hidden="true"></span>
+            <h1>寶可夢圖鑑 <span>Pokédex</span></h1>
+        </header>
+
+        <form id="search" class="search">
+            <label for="query">搜尋寶可夢</label>
+            <div class="controls">
+                <input id="query" name="query" placeholder="例如 pikachu 或 25" maxlength="80"
+                       autocomplete="off" spellcheck="false" required>
+                <button type="submit">搜尋</button>
+                <button type="button" id="random" class="secondary">隨機寶可夢</button>
+            </div>
+        </form>
+
+        <p id="status" role="status" aria-live="polite"></p>
+
+        <article id="card" class="card" aria-labelledby="pokemon-name" hidden>
+            <div id="art" class="art">
+                <p id="image-message" role="status" hidden></p>
+            </div>
+            <div class="details">
+                <p id="pokemon-id" class="number"></p>
+                <h2 id="pokemon-name"></h2>
+                <ul id="types" class="types" aria-label="屬性"></ul>
+                <dl class="measurements">
+                    <div><dt>身高</dt><dd id="height"></dd></div>
+                    <div><dt>體重</dt><dd id="weight"></dd></div>
+                </dl>
+            </div>
+        </article>
+
+        <nav id="navigation" aria-label="圖鑑順序" hidden>
+            <button type="button" id="previous" class="secondary">← 上一隻</button>
+            <button type="button" id="next" class="secondary">下一隻 →</button>
+        </nav>
+
+        <footer>資料與圖片來源 <a href="https://pokeapi.co/">PokéAPI</a></footer>
+    </main>
+</body>
+</html>
